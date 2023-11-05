@@ -1,4 +1,4 @@
-// import Phaser from "phaser";
+// import Phaser from "phaser"
 import VirtualJoystickPlugin from 'phaser3-rex-plugins/plugins/virtualjoyStick-plugin.js';
 import bomb from './assets/bomb.png'
 import collect from './assets/collect.mp3'
@@ -45,7 +45,7 @@ var config = {
             plugin: VirtualJoystickPlugin,
             start: true
         },
-        // ...
+            // ...
         ]
     }
 };
@@ -66,17 +66,17 @@ var music
 function isMobile() {
     const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
     return regex.test(navigator.userAgent);
-  }
+}
 function is_touch_enabled() {
-    return ( 'ontouchstart' in window ) || 
-           ( navigator.maxTouchPoints > 0 ) || 
-           ( navigator.msMaxTouchPoints > 0 );
+    return ('ontouchstart' in window) ||
+        (navigator.maxTouchPoints > 0) ||
+        (navigator.msMaxTouchPoints > 0);
 }
 
 function getScreenCenter() {
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     const screenCenterY = this.cameras.main.worldView.y + this.cameras.main.height / 2;
-    return {screenCenterX, screenCenterY}
+    return { screenCenterX, screenCenterY }
 }
 
 var game = new Phaser.Game(config);
@@ -89,11 +89,69 @@ function preload() {
     this.load.spritesheet('dude', dude, { frameWidth: 32, frameHeight: 48 });
     this.load.atlas("spritesheet", spritesheet, spriteJson);
     // this.load.plugin('rexvirtualjoyStickplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexvirtualjoyStickplugin.min.js', true);
-    this.load.audio("collect",collect)
-    this.load.audio("kill",kill)
+    this.load.audio("collect", collect)
+    this.load.audio("kill", kill)
     this.load.svg('musicon', musicon)
     this.load.svg('musicoff', musicoff)
     this.load.audio("music", musicUrl)
+    const progressBar = this.add.graphics();
+    const progressBox = this.add.graphics();
+    progressBox.fillStyle(0x222222, 0.8);
+    progressBox.fillRect(240, 270, 320, 50);
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+    const loadingText = this.make.text({
+        x: width / 2,
+        y: height / 2 - 50,
+        text: 'Loading...(this may take a minute or a little more)',
+        style: {
+            font: '20px monospace',
+            fill: '#ffffff'
+        }
+    });
+    loadingText.setOrigin(0.5, 0.5);
+    const percentText = this.make.text({
+        x: width / 2,
+        y: height / 2 - 5,
+        text: '0%',
+        style: {
+            font: '18px monospace',
+            fill: '#ffffff'
+        }
+    });
+    percentText.setOrigin(0.5, 0.5);
+    // const assetText = this.make.text({
+    //     x: width / 2,
+    //     y: height / 2 + 50,
+    //     text: '',
+    //     style: {
+    //         font: '18px monospace',
+    //         fill: '#ffffff'
+    //     }
+    // });
+    // assetText.setOrigin(0.5, 0.5);
+    this.load.on('progress', function (value) {
+        console.log(value);
+        progressBar.clear();
+        progressBar.fillStyle(0xffffff, 1);
+        progressBar.fillRect(250, 280, 300 * value, 30);
+        try {
+            percentText.setText(parseInt(value * 100) + '%');
+        } catch (e) { }
+    });
+
+    this.load.on('fileprogress', function (file) {
+        console.log(file.src);
+        // assetText.setText('Loading asset: ' + file.key);
+    });
+    this.load.on('complete', function () {
+        console.log('complete');
+        progressBar.destroy();
+        progressBox.destroy();
+        loadingText.destroy();
+        percentText.destroy();
+        // assetText.destroy();
+    });
 }
 
 function create() {
@@ -156,7 +214,7 @@ function create() {
             { key: 'spritesheet', frame: "cy6.png" },
             { key: 'spritesheet', frame: "cy7.png" },
             { key: 'spritesheet', frame: "cy8.png" },
-            { key: 'spritesheet', frame: "cy9.png" },
+            // { key: 'spritesheet', frame: "cy9.png" },
         ],
         frameRate: 0.3,
         repeat: -1
@@ -201,28 +259,28 @@ function create() {
 
     const musicon = this.add.image(750, 50, 'musicon');
     const musicoff = this.add.image(750, 50, 'musicoff');
-    music = this.sound.add('music',{loop: true})
+    music = this.sound.add('music', { loop: true })
     musicoff.setVisible(false)
     musicon.addListener('pointerdown', () => {
         music.pause();
         musicon.setVisible(false);
         musicoff.setVisible(true)
     })
-    musicoff.addListener('pointerdown', () => {music.resume();musicoff.setVisible(false);musicon.setVisible(true)})
+    musicoff.addListener('pointerdown', () => { music.resume(); musicoff.setVisible(false); musicon.setVisible(true) })
 
     is_touch_enabled() && (joyStick = this.plugins.get('rexVirtualJoystick').add(this, {
         x: 140,
         y: 480,
         radius: 100,
     }));
-    if(window.innerHeight > window.innerWidth) {
+    if (window.innerHeight > window.innerWidth) {
         const p = document.createElement('p')
         p.innerText = '横屏体验更佳'
         p.style.textAlign = 'center'
         document.body.appendChild(p)
         window.addEventListener('resize', () => {
             console.log('resize')
-            if(window.innerHeight > window.innerWidth) {
+            if (window.innerHeight > window.innerWidth) {
                 p.style.display = 'block'
             } else {
                 p.style.display = 'none'
@@ -230,33 +288,27 @@ function create() {
         })
         window.addEventListener('deviceorientation', () => {
             console.log('deviceorientation')
-            if(window.innerHeight > window.innerWidth) {
+            if (window.innerHeight > window.innerWidth) {
                 p.style.display = 'block'
             } else {
                 p.style.display = 'none'
             }
         })
     }
-    if(!gameOver) {
-        if(this.sys.game.device.fullscreen.available) {
-            const {screenCenterX, screenCenterY} = getScreenCenter.call(this)
-            const button = this.add.dom(screenCenterX, screenCenterY, 'button', 'width: 100px; height: 50px; border-radius: 20px;cursor: pointer; border-color: yellow', 'start').setOrigin(0.5);
-            button.addListener('click')
-            button.on('click', () => { 
-                document.body[this.sys.game.device.fullscreen.request](); 
-                button.setVisible(false)
-                gameStart = true; 
-                music.play();
-                musicon.setInteractive()
-                musicoff.setInteractive()
-            })
-        }  else {
-            gameStart = true; 
+    if (!gameOver) {
+        const { screenCenterX, screenCenterY } = getScreenCenter.call(this)
+        const button = this.add.dom(screenCenterX, screenCenterY, 'button', 'width: 100px; height: 50px; border-radius: 20px;cursor: pointer; border-color: yellow', 'start').setOrigin(0.5);
+        button.addListener('click')
+        button.on('click', () => {
+            if (this.sys.game.device.fullscreen.available) {
+                document.body[this.sys.game.device.fullscreen.request]();
+            }
+            button.setVisible(false)
+            gameStart = true;
             music.play();
             musicon.setInteractive()
             musicoff.setInteractive()
-        }
-        
+        })
     } else {
         gameOver = false
         musicon.setInteractive()
@@ -329,7 +381,7 @@ function hitBomb(player, bomb) {
 
     gameOver = true;
 
-    const {screenCenterX, screenCenterY} = getScreenCenter.call(this)
+    const { screenCenterX, screenCenterY } = getScreenCenter.call(this)
     const button = this.add.dom(screenCenterX, screenCenterY, 'button', 'width: 100px; height: 50px; border-radius: 20px;cursor: pointer; border-color: yellow', 'play again').setOrigin(0.5);
     button.addListener('click')
     button.on('click', () => { music.stop(); this.scene.restart() })
